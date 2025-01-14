@@ -98,7 +98,7 @@ float fmul(double aa, double bb) {
 
   uint64_t absx, ex;
   absx = aa_bits & 0x7FFFFFFFFFFFFFFF; // (2^63) - 1
-  ex = absx >> 52; // exponent of x
+  ex = absx >> 52; // exponent of x, p=53, and exponent field=11, 53+11=64bits so this how you get to the exponent part 
   print_variable(ex, "ex");
 
   uint64_t absy, ey;
@@ -115,7 +115,7 @@ float fmul(double aa, double bb) {
 
   uint64_t mx, my, lambday, lambdax;
   // the max between the leading zeros of x and the bit width ofthe  exponent wise
-  mx = maxu(nlz(absx), 11); // nlz(absx) = leading zeros of x and 8 is the bit width of the exponent bias
+  mx = maxu(nlz(absx), 11); // nlz(absx) = leading zeros of x and 11 is the bit width of the exponent bias
   print_variable(mx, "mx");
 
   lambdax = mx - 11;  //leading zeros of significand x
@@ -135,10 +135,10 @@ float fmul(double aa, double bb) {
   mpy = (bb_bits << my) |  0x8000000000000000; // normalize significand y
   print_bits(mpx, "mpx");
   print_bits(mpy, "mpy");
-  highs = mul(mpx, mpy); // upper 32-bit of the product of mantissas
+  highs = mul(mpx, mpy); // upper 128-bit of the product of mantissas
   c = highs >= 0x8000000000000000; // c = 0 if m'xm'y in [1,2) else 1 if m'xm'y in [2,4)
   print_variable(c, "c");
-  lows = mullow(mpx, mpy); // lower 32-bit of the product of mantissas
+  lows = mullow(mpx, mpy); // lower 64-bit of the product of mantissas
 
   // the product of two 32 bit is a 64 bit number. this 64 bit can be sttored in two 32 bit variable; hence the highs and lows variable
   print_bits(highs, "highs");
