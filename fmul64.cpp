@@ -136,7 +136,7 @@ float fmul(double aa, double bb) {
   print_bits(mpx, "mpx");
   print_bits(mpy, "mpy");
   highs = mul(mpx, mpy); // upper 128-bit of the product of mantissas
-  c = highs >= 0x8000000000000000; // c = 0 if m'xm'y in [1,2) else 1 if m'xm'y in [2,4)
+  c = highs >= 0x8000000000000000; // c = 0 if m'xm'y in [1,2) else 1 if m'xm'y in [2,4)... c ensures that l=m'xm'y*2^c is in the range [1,2)
   print_variable(c, "c");
   lows = mullow(mpx, mpy); // lower 64-bit of the product of mantissas
 
@@ -144,13 +144,19 @@ float fmul(double aa, double bb) {
   print_bits(highs, "highs");
   print_bits(lows, "lows");
 
-  lowt = (lows != 0);
+  // guard bit and sticky bit are used to deduce RN(l) ie rounding.
+  // if c=0 then since m'xm'y >= 1 bit s0 = 1
+  // then if l=(1.s1....s46) then G=s24 and T=OR(s25,...,s46)
+  // correctly rounded valaue
+  ///  RN(l) = (1.s1...s23) + B * 2^-23 where B = G AND (s23 OR T).
+  // for this you need to consider double precesion
+  lowt = (lows != 0); //sticky bits of the low half of the 128 bit
  // m = (highs >> (39 + c)); // the significand 8 = 60 - 52
   print_bits(m, "m");
   //morlowt = m | lowt;
 
   g = (highs >> (38 + c)) & 1;
-  hight = (highs << (55 - c)) != 0;
+  hight = (highs << (55 - c)) != 0; // sticky bits, he sticky bits are the bits aafter the round bit
   print_variable(g, "guard bit");
   print_variable(hight, "sticky bit for highs");
   print_variable(lowt, "sticky bit for lows");
