@@ -1,6 +1,9 @@
-# fmul
-this repo consists of the work that led to an llvm pr consisting of 
-fmul: double -> double -> float
+# a small c floating point math library
 
-fmul64: https://godbolt.org/z/ardbPnrsz
-fmul32: https://godbolt.org/z/oco6ETaY3
+this consists of implementations of some of the  algorithms in the
+handbook of floating point math.
+
+for example, the fmul code in this repo made it to llvm libc.
+
+I am going to rewrite code from this handbook and templatize some of the
+code and make a nice library from this.
